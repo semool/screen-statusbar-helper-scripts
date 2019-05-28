@@ -1,0 +1,13 @@
+#!/bin/bash
+
+snore()
+{
+  local IFS
+  [[ -n "${_snore_fd:-}" ]] || exec {_snore_fd}<> <(:)
+  read ${1:+-t "$1"} -u $_snore_fd || :
+}
+
+while killall -0 screen; do
+   echo $(awk '{ printf "%04d", $1 / 1000 }' /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq)"MHz"
+   snore 2.147
+done

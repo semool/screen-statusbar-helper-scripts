@@ -1,0 +1,14 @@
+#!/bin/bash
+export LC_ALL=C
+
+snore()
+{
+  local IFS
+  [[ -n "${_snore_fd:-}" ]] || exec {_snore_fd}<> <(:)
+  read ${1:+-t "$1"} -u $_snore_fd || :
+}
+
+while killall -0 screen; do
+  cat /proc/loadavg | sed 's/ /\//g' | cut -d "/" -f1-3
+  snore 11.379
+done

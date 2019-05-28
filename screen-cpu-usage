@@ -1,0 +1,53 @@
+#!/bin/bash
+export LC_ALL=C
+
+# Tip to create 100% Load on one Core: yes > /dev/null &
+# Run multiple times to create 100% Load on all Cores
+# snore: https://blog.dhampir.no/content/sleeping-without-a-subprocess-in-bash-and-how-to-sleep-forever
+
+PREV_TOTAL=0
+PREV_IDLE=0
+BARWIDTH=10
+DOT="="
+
+snore()
+{
+  local IFS
+  [[ -n "${_snore_fd:-}" ]] || exec {_snore_fd}<> <(:)
+  read ${1:+-t "$1"} -u $_snore_fd || :
+}
+
+while killall -0 screen; do # Kill the script when screen is not running
+#while true; do # Run forever (testmode)
+  CPU=(`sed -n 's/^cpu\s//p' /proc/stat`)
+  IDLE=${CPU[3]}
+
+  TOTAL=0
+  for VALUE in "${CPU[@]}"; do
+    let "TOTAL=$TOTAL+$VALUE"
+  done
+
+  let "DIFF_IDLE=$IDLE-$PREV_IDLE"
+  let "DIFF_TOTAL=$TOTAL-$PREV_TOTAL"
+  let "DIFF_USAGE=(1000*($DIFF_TOTAL-$DIFF_IDLE)/$DIFF_TOTAL+5)/10"
+
+  UNDERONE=false
+  if [ "$DIFF_USAGE" == 0 ]; then
+     UNDERONE=true
+     DIFF_USAGE_UNDERONE=`echo "scale=1; (1000*($DIFF_TOTAL-$DIFF_IDLE)/$DIFF_TOTAL)/10" | bc`
+     if [ "$DIFF_USAGE_UNDERONE" == "0" ]; then UNDERONE=false; fi
+  fi
+
+  printf -v DOTS "%*s" "$(( $DIFF_USAGE*$BARWIDTH/100 ))" ""; DOTS=${DOTS// /$DOT};
+
+  if [ "$UNDERONE" == true ]; then
+     printf "[%-*s] %.1f%%%s\n" "$BARWIDTH" "$DOTS" "$DIFF_USAGE_UNDERONE" "$*";
+  else
+     printf "[%-*s] %3d%%%s\n" "$BARWIDTH" "$DOTS" "$DIFF_USAGE" "$*";
+  fi
+
+  PREV_TOTAL="$TOTAL"
+  PREV_IDLE="$IDLE"
+
+  snore 1.173
+done

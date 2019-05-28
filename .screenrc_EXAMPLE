@@ -1,0 +1,22 @@
+# Keine Willkommensnachricht
+startup_message off
+# Kein blinken beim tab drücken
+vbell off
+# Mehr Scrollback Buffer
+defscrollback 10000
+# Backscroll im Log ausserhalb des Putty Fensters
+termcapinfo xterm|xterms|xs|rxvt ti@:te@
+# Statusleiste
+#caption always "%{= wk} %-w%{= KW} [%n %t] %{-}%+w %= | %H | %l | %d.%m.%Y %c "
+# Mit Helfer Scripten
+backtick 1 0 0 /usr/sbin/screen-mem-usage
+backtick 2 0 0 /usr/sbin/screen-cpu-usage
+backtick 3 0 0 /usr/sbin/screen-cpu-clock
+backtick 4 0 0 /usr/sbin/screen-cpu-temp
+backtick 5 0 0 /usr/sbin/screen-load-average
+caption always "%{= wk} %-w%{= KW} [%n %t] %{-}%+w %= | %H |%2` %3` %4` | %1` | %5` | %d.%m.%Y %c "
+# Zu öffnende Screens
+screen -t root
+screen -t htop htop
+screen -t iftop iftop -b -o 2s
+screen -t bmon bmon -U -p eth0

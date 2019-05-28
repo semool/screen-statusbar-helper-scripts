@@ -1,0 +1,31 @@
+#!/bin/bash
+export LC_ALL=C
+
+snore()
+{
+  local IFS
+  [[ -n "${_snore_fd:-}" ]] || exec {_snore_fd}<> <(:)
+  read ${1:+-t "$1"} -u $_snore_fd || :
+}
+
+total_mem=$(/usr/bin/free -h | /usr/bin/awk '$1 == "Mem:" {print $2}')
+if [ ! "$total_mem" ]; then total_mem=$(/usr/bin/free -h | /usr/bin/awk '$1 == "Speicher:" {print $2}'); fi
+
+# Wheezy Bugfix
+if [ "$total_mem" == "0B" ]; then
+  total_mem=$(/bin/cat /proc/meminfo | /bin/grep MemTotal | /usr/bin/awk '{print $2/1024}')
+  check_memsize=$(/usr/bin/expr length `echo $total_mem`)
+  if [ "$check_memsize" -gt "3" ]; then total_mem=`/usr/bin/expr $total_mem / 1024`
+    total_mem="${total_mem}G"
+  else
+    total_mem="${total_mem}MB"
+  fi
+fi
+
+
+while killall -0 screen; do
+  current_mem=$(/usr/bin/free -h | /usr/bin/awk '$1 == "Mem:" {print $3}')
+  if [ ! "$current_mem" ]; then current_mem=$(/usr/bin/free -h | /usr/bin/awk '$1 == "Speicher:" {print $3}'); fi
+  echo "${current_mem}/${total_mem}"
+  snore 5.731
+done

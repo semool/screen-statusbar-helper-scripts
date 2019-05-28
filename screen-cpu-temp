@@ -1,0 +1,22 @@
+#!/bin/bash
+
+snore()
+{
+  local IFS
+  [[ -n "${_snore_fd:-}" ]] || exec {_snore_fd}<> <(:)
+  read ${1:+-t "$1"} -u $_snore_fd || :
+}
+
+ZONE="zone0"
+TEMP=""
+if [ -e "/sys/class/thermal/thermal_zone2/temp" ]; then ZONE="zone2"; fi
+if [ -e "/sys/class/thermal/thermal_$ZONE/temp" ]; then TEMP="1"; fi
+
+while killall -0 screen; do
+   if [ "$TEMP" ]; then
+      cat /sys/class/thermal/thermal_$ZONE/temp | awk '{printf "+%2.0fC\n", $1/1000}'
+   else
+      sensors | grep "Core 0:" | awk -F ' ' '{print $3$4}' | cut -d "." -f1 | awk '{printf "+%2.0fC\n", $1}'
+   fi
+   snore 1.852
+done
