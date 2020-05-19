@@ -1,5 +1,6 @@
 #!/bin/bash
 
+RANDOMSNORE=`echo 1.${RANDOM:0:3}`
 snore()
 {
   local IFS
@@ -18,5 +19,5 @@ while killall -0 screen; do
    else
       sensors | grep "Core 0:" | awk -F ' ' '{print $3$4}' | cut -d "." -f1 | awk '{printf "+%2.0fC\n", $1}'
    fi
-   snore 1.852
+   snore $RANDOMSNORE
 done

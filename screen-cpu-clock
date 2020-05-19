@@ -1,5 +1,6 @@
 #!/bin/bash
 
+RANDOMSNORE=`echo 2.${RANDOM:0:3}`
 snore()
 {
   local IFS
@@ -9,5 +10,5 @@ snore()
 
 while killall -0 screen; do
    echo $(awk '{ printf "%04d", $1 / 1000 }' /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq)"MHz"
-   snore 2.147
+   snore $RANDOMSNORE
 done

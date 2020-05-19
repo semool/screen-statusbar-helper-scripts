@@ -5,6 +5,7 @@ export LC_ALL=C
 # Run multiple times to create 100% Load on all Cores
 # snore: https://blog.dhampir.no/content/sleeping-without-a-subprocess-in-bash-and-how-to-sleep-forever
 
+RANDOMSNORE=`echo 1.${RANDOM:0:3}`
 PREV_TOTAL=0
 PREV_IDLE=0
 BARWIDTH=10
@@ -49,5 +50,5 @@ while killall -0 screen; do # Kill the script when screen is not running
   PREV_TOTAL="$TOTAL"
   PREV_IDLE="$IDLE"
 
-  snore 1.173
+  snore $RANDOMSNORE
 done

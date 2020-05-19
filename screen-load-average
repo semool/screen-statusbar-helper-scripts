@@ -1,6 +1,7 @@
 #!/bin/bash
 export LC_ALL=C
 
+RANDOMSNORE=`echo 11.${RANDOM:0:3}`
 snore()
 {
   local IFS
@@ -9,6 +10,6 @@ snore()
 }
 
 while killall -0 screen; do
-  cat /proc/loadavg | sed 's/ /\//g' | cut -d "/" -f1-3
-  snore 11.379
+  cut -d " " -f1-3 /proc/loadavg | sed 's/ /\//g'
+  snore $RANDOMSNORE
 done
